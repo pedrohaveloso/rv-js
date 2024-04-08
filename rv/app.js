@@ -7,9 +7,13 @@ Element.prototype.getTagOnly = function () {
  *
  * @type { NodeListOf<Element> }
  */
-const dataElements = document.querySelectorAll("[\\@data]");
+let dataElements = document.querySelectorAll("[\\@data]");
 
-dataElements.forEach((dataElement) => {
+const elementData = [];
+
+const echos = [];
+
+dataElements.forEach((dataElement, dataKey) => {
   /**
    * @type { string | null }
    */
@@ -24,21 +28,9 @@ dataElements.forEach((dataElement) => {
     return;
   }
 
-  /**
-   * @type { Map<string, any> | null }
-   */
-  let elementData = null;
-
   try {
-    elementData = new Map(
-      Object.entries(
-        JSON.parse(
-          elementDataAttribute
-            .replace("$", "")
-            .replace(/(\w+):/g, '"$1":')
-            .replace(/'/g, '"')
-        )
-      )
+    elementData[dataKey] = JSON.parse(
+      elementDataAttribute.replace(/(\w+):/g, '"$1":').replace(/'/g, '"')
     );
   } catch (ex) {
     console.error(
@@ -51,7 +43,83 @@ dataElements.forEach((dataElement) => {
     return;
   }
 
-  console.log(elementData);
+  /**
+   * @param { HTMLElement } element
+   */
+  function applyRules(element) {
+    element.childNodes.forEach((elementChild) => {
+      if (typeof elementChild.tagName === "undefined") {
+        return;
+      }
+
+      switch (elementChild.tagName.toLowerCase()) {
+        case "echo":
+          const attributeName = elementChild.attributes[0].name.replace(
+            "$",
+            ""
+          );
+
+          const echoText = document.createTextNode(
+            elementData[dataKey][attributeName]
+          );
+
+          echos.push({
+            rv: attributeName,
+            fn: (value) => (echoText.nodeValue = value),
+          });
+
+          elementChild.after(echoText);
+          elementChild.remove();
+
+          break;
+      }
+
+      if (elementChild.hasAttribute("@data")) {
+        dataElements = [...dataElements, ...[elementChild]];
+      }
+
+      if (elementChild.hasAttribute("@click")) {
+        elementChild.onclick = (event) => {
+          eval(
+            elementChild
+              .getAttribute("@click")
+              .replaceAll("$", "elementData[dataKey].rv")
+          );
+          console.log(elementData);
+        };
+      }
+
+      if (elementChild.children.length >= 1) {
+        applyRules(elementChild);
+      }
+    });
+  }
+
+  applyRules(dataElement);
+
+  elementData.forEach((data) => {
+    const elementDataIterable = new Map(Object.entries(data));
+
+    elementDataIterable.forEach((item, key) => {
+      elementData[dataKey][`rv${key}`] = item;
+
+      Object.defineProperty(elementData[dataKey], `rv${key}`, {
+        get: function () {
+          return this[key];
+        },
+
+        set: function (value) {
+          echos.forEach((echo) => {
+            if (echo.rv === key) {
+              echo.fn(value);
+            }
+          });
+
+          this[key] = value;
+        },
+      });
+    });
+  });
 });
 
 // function recursiveDataElement(i, dataElements) {

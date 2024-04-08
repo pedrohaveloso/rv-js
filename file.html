@@ -15,7 +15,47 @@
 
 </body>
 
-<main @data="{ $_ count: 0 }">
+<article @data="{ count: 0, message: 'Hello?' }">
+  <h1>Simple counter</h1>
+
+  <h2>
+    <echo $count></echo>
+  </h2>
+
+  <article @data="{ count: 0 }">
+    <echo $count></echo>
+
+    <button @click="$count++">
+      Increment
+    </button>
+  </article>
+
+  <section>
+    <button @click="$count++">
+      Increment
+    </button>
+
+    <button @click="$count--">
+      Decrement
+    </button>
+  </section>
+
+  <article>
+    <h1>Say</h1>
+  
+    <h2>
+      <echo $message></echo>
+    </h2>
+  
+    <section>
+      <button @click="$message = 'World'">
+        Change
+      </button>
+    </section>
+  </article>
+</article>
+
+<!-- <main @data="{ $count: 0 }">
   <h1>
     <echo $count></echo>
 
@@ -28,7 +68,7 @@
     <button @click="$count--">Decrement</button>
   </h1>
 
-  <article @data="{ message: 'World' }">
+  <article @data="{ $message: 'World' }">
     <p>
       <echo $message></echo>
     </p>
@@ -36,13 +76,13 @@
     <button @click="$message = 'Hello'">Hi?</button>
   </article>
 
-  <article @data="">
+  <article @data="{ $message: 'World' }">
     <p>
       <echo $message></echo>
     </p>
 
     <button @click="$message = 'Hello'">Hi?</button>
-  </article>
+  </article> -->
 </main>
 
 
