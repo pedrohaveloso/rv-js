@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script defer type="module" src="./rv.js"></script>
+  <script defer type="module" src="./rv/app.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 
   <title>Document</title>
@@ -15,7 +15,7 @@
 
 </body>
 
-<main @data="{ $count: 0 }">
+<main @data="{ $_ count: 0 }">
   <h1>
     <echo $count></echo>
 
@@ -29,6 +29,14 @@
   </h1>
 
   <article @data="{ message: 'World' }">
+    <p>
+      <echo $message></echo>
+    </p>
+
+    <button @click="$message = 'Hello'">Hi?</button>
+  </article>
+
+  <article @data="">
     <p>
       <echo $message></echo>
     </p>
