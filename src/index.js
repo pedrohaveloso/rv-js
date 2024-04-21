@@ -2,31 +2,39 @@
 
 import { Proto } from "./proto/proto.js";
 
-class CounterElement extends Proto.Element {
-  constructor() {
-    super();
-  }
+Proto.define(
+  "counter",
+  class CounterElement extends Proto.Element {
+    constructor() {
+      super();
+    }
 
-  counter = new Proto.Reactivity(0);
+    show = new Proto.Reactivity(true);
+    counter = new Proto.Reactivity(0);
 
-  render() {
-    this.innerHTML = Proto.html`
-      <h1 id="counter-text">${this.counter.value}</h1>
-      <button id="increment">Increment</button>
-      <button id="decrement">Decrement</button>
+    render() {
+      this.innerHTML = Proto.html`
+      <h1 id="value">${this.counter.value}</h1>
+      <button id="increment">increment</button>      
+      <button id="decrement">decrement</button>      
     `;
+    }
+
+    after() {
+      const h1 = this.select("#value", "h1");
+
+      this.counter.subscribe((value) => {
+        h1.innerText = value.toString();
+
+        value > 10 ? (this.show.value = false) : (this.show.value = true);
+      });
+
+      this.show.subscribe((value) => {
+        h1.style.display = value ? "flex" : "none";
+      });
+
+      this.select("#increment").onclick = () => this.counter.value++;
+      this.select("#decrement").onclick = () => this.counter.value--;
+    }
   }
-
-  after() {
-    const counterText = this.select("#counter-text");
-
-    this.counter.subscribe((value) => {
-      counterText.innerText = value.toString();
-    });
-
-    this.select("#increment").onclick = () => this.counter.value++;
-    this.select("#decrement").onclick = () => this.counter.value--;
-  }
-}
-
-customElements.define("p-counter", CounterElement);
+);
