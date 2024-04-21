@@ -9,14 +9,20 @@ Proto.define(
       super();
     }
 
-    show = new Proto.Reactivity(true);
     counter = new Proto.Reactivity(0);
+
+    increment() {
+      console.log("a");
+      this.counter.value++;
+    }
 
     render() {
       this.innerHTML = Proto.html`
-      <h1 id="value">${this.counter.value}</h1>
-      <button id="increment">increment</button>      
-      <button id="decrement">decrement</button>      
+        <h1 id="value">${this.counter.value}</h1>
+
+        <button id="increment" click="${() =>
+          this.increment()}">increment</button>      
+        <button id="decrement">decrement</button>      
     `;
     }
 
@@ -25,16 +31,10 @@ Proto.define(
 
       this.counter.subscribe((value) => {
         h1.innerText = value.toString();
-
-        value > 10 ? (this.show.value = false) : (this.show.value = true);
       });
 
-      this.show.subscribe((value) => {
-        h1.style.display = value ? "flex" : "none";
-      });
-
-      this.el("#increment").onclick = () => this.counter.value++;
-      this.el("#decrement").onclick = () => this.counter.value--;
+      // this.el("#increment").onclick = () => this.counter.value++;
+      // this.el("#decrement").onclick = () => this.counter.value--;
     }
   }
 );

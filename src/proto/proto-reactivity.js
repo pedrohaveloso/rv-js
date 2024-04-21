@@ -6,19 +6,27 @@
  */
 export class ProtoReactivity {
   /**
+   * @typedef {{
+   *    autoNotify?: boolean,
+   *    subscribe?: ((value: T) => void)[]
+   * }} opts
+   */
+
+  /**
    * @constructor
    * @param {T} initialValue
-   * @param {{autoNotify: boolean}} opts
+   * @param {opts} opts
    */
   constructor(initialValue, opts = { autoNotify: true }) {
     this.observers = [];
+
     this._opts = opts;
 
     Object.defineProperty(this, "value", {
       set(newValue) {
         this._value = newValue;
 
-        if (this._opts.autoNotify) {
+        if (this._opts.autoNotify !== false) {
           this.notify();
         }
       },
@@ -26,6 +34,10 @@ export class ProtoReactivity {
       get() {
         return this._value;
       },
+    });
+
+    this._opts.subscribe?.forEach((subscribe) => {
+      this.subscribe(subscribe);
     });
 
     this.value = initialValue;
