@@ -21,7 +21,7 @@ Proto.define(
     }
 
     after() {
-      const h1 = this.select("#value", "h1");
+      const h1 = this.el("#value", "h1");
 
       this.counter.subscribe((value) => {
         h1.innerText = value.toString();
@@ -33,8 +33,8 @@ Proto.define(
         h1.style.display = value ? "flex" : "none";
       });
 
-      this.select("#increment").onclick = () => this.counter.value++;
-      this.select("#decrement").onclick = () => this.counter.value--;
+      this.el("#increment").onclick = () => this.counter.value++;
+      this.el("#decrement").onclick = () => this.counter.value--;
     }
   }
 );

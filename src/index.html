@@ -6,8 +6,43 @@
     <title>Document</title>
   </head>
   <body>
-    <p-counter></p-counter>
+    <p-card text="Hello"></p-card>
 
-    <script type="module" src="./index.js"></script>
+    <script type="module" lang="javascript">
+      import { Proto } from "./proto/proto.js";
+
+      Proto.define(
+        "card",
+        class extends Proto.Element {
+          constructor() {
+            super();
+          }
+
+          text = new Proto.Reactivity(this.getAttribute("text") ?? "");
+
+          render() {
+            this.innerHTML = Proto.html`
+              <h1></h1>
+              <input id="inp1" type="text" />
+              <input id="inp2" type="text" />
+            `;
+          }
+
+          after() {
+            this.text.subscribe((value) => {
+              this.el("h1").innerText = value;
+            });
+
+            this.el("#inp1").oninput = (event) => {
+              this.text.value = event.target.value;
+            };
+
+            this.el("#inp2").oninput = (event) => {
+              this.text.value = event.target.value;
+            };
+          }
+        }
+      );
+    </script>
   </body>
 </html>

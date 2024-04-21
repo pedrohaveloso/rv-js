@@ -24,7 +24,7 @@ export class ProtoElement extends HTMLElement {
    * @param {?T} tag
    * @return {HTMLElementTagNameMap[T]}
    */
-  select(key, tag = null) {
+  el(key, tag = null) {
     /** @type {HTMLElementTagNameMap[T] | null} */
     let element = null;
 

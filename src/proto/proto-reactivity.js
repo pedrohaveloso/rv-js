@@ -12,13 +12,13 @@ export class ProtoReactivity {
    */
   constructor(initialValue, opts = { autoNotify: true }) {
     this.observers = [];
-    this.opts = opts;
+    this._opts = opts;
 
     Object.defineProperty(this, "value", {
       set(newValue) {
         this._value = newValue;
 
-        if (this.opts.autoNotify) {
+        if (this._opts.autoNotify) {
           this.notify();
         }
       },
@@ -40,10 +40,19 @@ export class ProtoReactivity {
     this.observers.push(observer);
   }
 
+  /**
+   * @method
+   * @param {(value: T) => void} observer
+   * @return {void}
+   */
   unsubscribe(observer) {
     this.observers = this.observers.filter((o) => o !== observer);
   }
 
+  /**
+   * @method
+   * @return {void}
+   */
   notify() {
     this.observers.forEach((observer) => observer(this.value));
   }
