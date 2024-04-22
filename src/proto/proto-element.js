@@ -24,7 +24,7 @@ export class ProtoElement extends HTMLElement {
    * @param {?T} tag
    * @return {HTMLElementTagNameMap[T]}
    */
-  el(key, tag = null) {
+  select(key, tag = null) {
     /** @type {HTMLElementTagNameMap[T] | null} */
     let element = null;
 
@@ -47,6 +47,17 @@ export class ProtoElement extends HTMLElement {
       /** @type {HTMLElementTagNameMap[T]} */
       (document.createElement(String(tag)))
     );
+  }
+
+  /**
+   * @method
+   * @template {keyof HTMLElementTagNameMap} T
+   * @param {string} key
+   * @param {?T} tag
+   * @return {HTMLElementTagNameMap[T]}
+   */
+  sel(key, tag = null) {
+    return this.select(key, tag);
   }
 
   /** @abstract */

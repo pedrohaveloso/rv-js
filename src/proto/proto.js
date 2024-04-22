@@ -35,3 +35,28 @@ export class Proto {
   static Element = ProtoElement;
   static Reactivity = ProtoReactivity;
 }
+
+// TODO:
+/**
+ * @method
+ * @template {keyof HTMLElementTagNameMap} T
+ * @param {T} tag
+ * @return {HTMLElementTagNameMap[T]}
+ */
+// static create(tag, { params = {}, children = [] }) {
+//   const element = document.createElement(tag);
+
+//   for (let key in params) {
+//     if (key === "style") {
+//       Object.assign(element.style, params[key]);
+//     } else {
+//       element[key] = params[key];
+//     }
+//   }
+
+//   children.forEach((child) => {
+//     element.append(child);
+//   });
+
+//   return element;
+// }

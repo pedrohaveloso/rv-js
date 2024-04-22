@@ -13,6 +13,21 @@ export class ProtoReactivity {
    */
 
   /**
+   * Create a reactive variable with the given initial value.
+   *
+   * ## Examples of uses:
+   * ```js
+   * const counter = new ProtoReactivity(0);
+   *
+   * counter.subscribe((value) => console.log(`The value is: ${value}.`));
+   *
+   * counter.value = 5;  // Logs: The value is: 5.
+   * counter.value = 10; // Logs: The value is: 10.
+   * counter.value = 15; // Logs: The value is: 15.
+   *
+   * counter.unsubscribe((value) => console.log(value));
+   * ```
+   *
    * @constructor
    * @param {T} initialValue
    * @param {opts} opts
