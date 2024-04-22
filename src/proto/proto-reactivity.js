@@ -9,32 +9,43 @@ import { ProtoElement } from "./proto-element.js";
  */
 export class ProtoReactivity {
   /**
-   * @typedef {{
-   *    autoNotify?: boolean,
-   *    autoReload?: [ProtoElement, string],
-   *    subscribe?: ((value: T) => void)[]
-   * }} opts
-   */
-
-  /**
    * Create a reactive variable with the given initial value.
    *
-   * ## Examples of uses:
+   * ### Examples of uses:
+   * 
    * ```js
-   * const counter = new ProtoReactivity(0);
+   * const counter = new Proto.Reactivity(0);
    *
    * counter.subscribe((value) => console.log(`The value is: ${value}.`));
    *
    * counter.value = 5;  // Logs: The value is: 5.
    * counter.value = 10; // Logs: The value is: 10.
-   * counter.value = 15; // Logs: The value is: 15.
    *
    * counter.unsubscribe((value) => console.log(value));
    * ```
-   *
+   * 
+   * 
+   * ### Reactivity in a Proto.Element:
+   * 
+   * ```js
+   * class CounterElement extends Proto.Element {
+   *   ...
+   * 
+   *   counter = new Proto.Reactivity(0, { autoReload: [this, "counter"] });
+   *  
+   *   render() {
+   *     this.innerHTML = Proto.html`<h1 p-data="counter"></h1>`;
+   *   }
+   * }
+   * ```
+   * 
    * @constructor
    * @param {T} initialValue
-   * @param {opts} opts
+   * @param {{
+   *    autoNotify?: boolean,
+   *    autoReload?: [ProtoElement, string],
+   *    subscribe?: ((value: T) => void)[]
+   * }} opts
    */
   constructor(initialValue, opts = { autoNotify: true }) {
     this.observers = [];

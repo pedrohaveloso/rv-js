@@ -27,17 +27,19 @@ export class ProtoElement extends HTMLElement {
    * @return {HTMLElementTagNameMap[T]}
    */
   select(key, tag = null) {
-    /** @type {HTMLElementTagNameMap[T] | null} */
+    /** @type {HTMLElementTagNameMap[T] | null | undefined} */
     let element = null;
 
     switch (key[0]) {
       case "#" || ".":
-        element = this.querySelector(`${key[0]}${this.id}-${key.substring(1)}`);
+        element = this.shadow?.querySelector(
+          `${key[0]}${this.id}-${key.substring(1)}`
+        );
 
         break;
 
       default:
-        element = this.querySelector(key);
+        element = this.shadow?.querySelector(key);
     }
 
     if (element === null) {
@@ -63,16 +65,29 @@ export class ProtoElement extends HTMLElement {
   }
 
   /** @abstract */
-  render() {}
+  render() {
+    return "";
+  }
 
   /** @abstract */
-  after() {}
+  after() {
+    return;
+  }
+
+  /** @abstract */
+  styles() {
+    return "";
+  }
 
   /**
    * @method
-   * @param {HTMLCollection} children
+   * @param {HTMLCollection | undefined} children
    */
-  #applyChildrenIds(children = this.children) {
+  #applyChildrenIds(children = this.shadow?.children) {
+    if (!children) {
+      return;
+    }
+
     for (const child of children) {
       if (child.children.length > 0) {
         this.#applyChildrenIds(child.children);
@@ -88,9 +103,9 @@ export class ProtoElement extends HTMLElement {
    * @method
    */
   #load() {
-    const elements = this.querySelectorAll("[p-data]");
+    const elements = this.shadow?.querySelectorAll("[p-data]");
 
-    elements.forEach((element) => {
+    elements?.forEach((element) => {
       const protoData = element.getAttribute("p-data");
 
       if (!protoData) {
@@ -127,9 +142,9 @@ export class ProtoElement extends HTMLElement {
    * @param {any} value
    */
   reload(name, value) {
-    const elements = this.querySelectorAll(`[p-data="${name}"]`);
+    const elements = this.shadow?.querySelectorAll(`[p-data="${name}"]`);
 
-    elements.forEach((element) => {
+    elements?.forEach((element) => {
       element.innerHTML = value;
     });
   }
@@ -137,7 +152,10 @@ export class ProtoElement extends HTMLElement {
   connectedCallback() {
     this.id = this._opts.customId ?? generateId();
 
-    this.render();
+    this.shadow = this.attachShadow({ mode: "open" });
+
+    this.shadow.innerHTML = this.render();
+    this.shadow.innerHTML += this.styles();
 
     this.#applyChildrenIds();
     this.#load();

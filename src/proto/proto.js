@@ -30,11 +30,21 @@ export class Proto {
    * @param {ElementDefinitionOptions} options
    */
   static define(name, constructor, options = {}) {
-    customElements.define(`p-${name}`, constructor, options);
+    customElements.define(name, constructor, options);
   }
 
   static Element = ProtoElement;
   static Reactivity = ProtoReactivity;
+
+  /**
+   * @template T
+   * @param {T[]} array
+   * @param {(value: T, index: number, array: T[]) => T} fn
+   * @returns
+   */
+  static map(array, fn) {
+    return array.map(fn).join("");
+  }
 }
 
 // TODO:
