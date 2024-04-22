@@ -1,4 +1,5 @@
 // @ts-check
+"use strict";
 
 import { generateId } from "./utils/generate-id.js";
 import { html } from "./utils/html.js";

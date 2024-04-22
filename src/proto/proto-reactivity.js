@@ -1,4 +1,7 @@
 // @ts-check
+"use strict";
+
+import { ProtoElement } from "./proto-element.js";
 
 /**
  * @class
@@ -8,6 +11,7 @@ export class ProtoReactivity {
   /**
    * @typedef {{
    *    autoNotify?: boolean,
+   *    autoReload?: [ProtoElement, string],
    *    subscribe?: ((value: T) => void)[]
    * }} opts
    */
@@ -78,9 +82,23 @@ export class ProtoReactivity {
 
   /**
    * @method
+   */
+  #autoReload() {
+    if (
+      this._opts.autoReload &&
+      this._opts.autoReload[0] instanceof ProtoElement
+    ) {
+      this._opts.autoReload[0].reload(this._opts.autoReload[1], this.value);
+    }
+  }
+
+  /**
+   * @method
    * @return {void}
    */
   notify() {
+    this.#autoReload();
+
     this.observers.forEach((observer) => observer(this.value));
   }
 }
