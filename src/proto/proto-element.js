@@ -19,15 +19,6 @@ export class ProtoElement extends HTMLElement {
   }
 
   /**
-   * @param {string} name
-   * @param {CustomElementConstructor} constructor
-   * @param {ElementDefinitionOptions} options
-   */
-  static define(name, constructor, options = {}) {
-    customElements.define(name, constructor, options);
-  }
-
-  /**
    * @template {keyof HTMLElementTagNameMap} T
    * @param {string} key
    * @param {?T} tag
@@ -94,9 +85,39 @@ export class ProtoElement extends HTMLElement {
    * @param {ShadowRoot} shadow
    */
   #load(shadow) {
-    shadow.querySelectorAll("[proto-text]").forEach((element) => {
-      element.textContent =
-        this.reactiveData[element.getAttribute("proto-text")];
+    /** @param {Element} element */
+    const elementMsg = (element) => `Element: ${element.outerHTML}`;
+
+    shadow.querySelectorAll("[proto\\:text]").forEach((element) => {
+      const protoText = element.getAttribute("proto:text");
+
+      if (protoText === null || !(protoText in this.reactiveData)) {
+        console.error(
+          `No reactive data for "${protoText}". ${elementMsg(element)}`
+        );
+
+        return;
+      }
+
+      element.textContent = this.reactiveData[protoText];
+    });
+
+    shadow.querySelectorAll("[proto\\:onclick]").forEach((element) => {
+      const protoOnClick = element.getAttribute("proto:onclick");
+
+      if (protoOnClick === null || !(protoOnClick in this)) {
+        console.error(
+          `No onclick function for "${protoOnClick}". ${elementMsg(element)}`
+        );
+
+        return;
+      }
+
+      if ("onclick" in element) {
+        element.onclick = () => {
+          this[element.getAttribute("proto:onclick") ?? ""]();
+        };
+      }
     });
   }
 
@@ -107,7 +128,7 @@ export class ProtoElement extends HTMLElement {
    * @param {T} value
    */
   #reload(shadow, name, value) {
-    shadow.querySelectorAll(`[proto-text="${name}"]`).forEach((element) => {
+    shadow.querySelectorAll(`[proto\\:text="${name}"]`).forEach((element) => {
       element.textContent = String(value);
     });
   }

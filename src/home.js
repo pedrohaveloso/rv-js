@@ -3,30 +3,29 @@
 
 import { Proto } from "./proto/proto.js";
 
-class CounterElement extends Proto.Element {
-  constructor() {
-    super();
-  }
+Proto.define(
+  "counter-el",
+  class CounterElement extends Proto.Element {
+    constructor() {
+      super();
+    }
 
-  counter = this.reactive(0, "counter");
+    counter = this.reactive(0, "counter");
 
-  render() {
-    return Proto.html`
-      <div>
-        <h1>
-          Counter:
-          <span proto-text="counter"></span>
-        </h1>
-        <button id="increment">Increment</button>
-      </div>
-    `;
-  }
-
-  after() {
-    this.select("#increment").onclick = () => {
+    increment() {
       this.counter.value++;
-    };
-  }
-}
+    }
 
-Proto.Element.define("counter-el", CounterElement);
+    render() {
+      return Proto.html`
+        <div>
+          <h1>
+            Hello.
+          </h1>
+          <p proto:text="counter"></p>
+          <button proto:onclick="increment">Increment</button>
+        </div>
+      `;
+    }
+  }
+);

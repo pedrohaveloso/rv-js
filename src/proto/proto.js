@@ -29,4 +29,26 @@ export const Proto = {
   map(array, fn) {
     return array.map(fn).join("");
   },
+
+  /**
+   * @param {string} name
+   * @param {CustomElementConstructor} constructor
+   * @param {ElementDefinitionOptions} options
+   */
+  define(name, constructor, options = {}) {
+    customElements.define(name, constructor, options);
+  },
+
+  /**
+   * @param {[
+   *   string,
+   *   CustomElementConstructor,
+   *   ElementDefinitionOptions?
+   * ][]} elements
+   */
+  defineAll(...elements) {
+    elements.forEach((element) => {
+      this.define(element[0], element[1], element[2] ?? {});
+    });
+  },
 };
