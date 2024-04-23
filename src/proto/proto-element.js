@@ -1,7 +1,6 @@
 // @ts-check
 "use strict";
 
-import { ProtoReactivity } from "./proto-reactivity.js";
 import { generateId } from "./utils/generate-id.js";
 
 /**
@@ -20,7 +19,15 @@ export class ProtoElement extends HTMLElement {
   }
 
   /**
-   * @method
+   * @param {string} name
+   * @param {CustomElementConstructor} constructor
+   * @param {ElementDefinitionOptions} options
+   */
+  static define(name, constructor, options = {}) {
+    customElements.define(name, constructor, options);
+  }
+
+  /**
    * @template {keyof HTMLElementTagNameMap} T
    * @param {string} key
    * @param {?T} tag
@@ -28,21 +35,9 @@ export class ProtoElement extends HTMLElement {
    */
   select(key, tag = null) {
     /** @type {HTMLElementTagNameMap[T] | null | undefined} */
-    let element = null;
+    let element = this.shadow?.querySelector(key);
 
-    switch (key[0]) {
-      case "#" || ".":
-        element = this.shadow?.querySelector(
-          `${key[0]}${this.id}-${key.substring(1)}`
-        );
-
-        break;
-
-      default:
-        element = this.shadow?.querySelector(key);
-    }
-
-    if (element === null) {
+    if (element === null || element === undefined) {
       console.error(`Element ${key} (parent ${this.id}) is null or undefined.`);
     }
 
@@ -51,17 +46,6 @@ export class ProtoElement extends HTMLElement {
       /** @type {HTMLElementTagNameMap[T]} */
       (document.createElement(String(tag)))
     );
-  }
-
-  /**
-   * @method
-   * @template {keyof HTMLElementTagNameMap} T
-   * @param {string} key
-   * @param {?T} tag
-   * @return {HTMLElementTagNameMap[T]}
-   */
-  sel(key, tag = null) {
-    return this.select(key, tag);
   }
 
   /** @abstract */
@@ -74,78 +58,57 @@ export class ProtoElement extends HTMLElement {
     return;
   }
 
-  /** @abstract */
-  styles() {
-    return "";
+  reactiveData = {};
+
+  /**
+   * @template T
+   * @param {T} value
+   * @param {string} name
+   */
+  reactive(value, name) {
+    this.reactiveData[name] = value;
+
+    /** @param {T} newValue */
+    const updateReactiveData = (newValue) => {
+      value = newValue;
+
+      if (this.shadow) {
+        this.#reload(this.shadow, name, value);
+      }
+    };
+
+    const getReactiveData = () => value;
+
+    return {
+      get value() {
+        return getReactiveData();
+      },
+
+      set value(newValue) {
+        updateReactiveData(newValue);
+      },
+    };
   }
 
   /**
-   * @method
-   * @param {HTMLCollection | undefined} children
+   * @param {ShadowRoot} shadow
    */
-  #applyChildrenIds(children = this.shadow?.children) {
-    if (!children) {
-      return;
-    }
-
-    for (const child of children) {
-      if (child.children.length > 0) {
-        this.#applyChildrenIds(child.children);
-      }
-
-      if (child.id !== null && child.id !== "") {
-        child.id = `${this.id}-${child.id}`;
-      }
-    }
-  }
-
-  /**
-   * @method
-   */
-  #load() {
-    const elements = this.shadow?.querySelectorAll("[p-data]");
-
-    elements?.forEach((element) => {
-      const protoData = element.getAttribute("p-data");
-
-      if (!protoData) {
-        console.error(
-          `Proto-data of element (parent: ${this.id}) is empty. \n Element: ${element.outerHTML}`
-        );
-
-        return;
-      }
-
-      if (typeof this[protoData] === "undefined") {
-        console.error(
-          `Proto-data "${protoData}" (parent: ${this.id}) does not exist in class. \n Element: ${element.outerHTML}`
-        );
-
-        return;
-      }
-
-      if (!(this[protoData] instanceof ProtoReactivity)) {
-        console.error(
-          `Proto-data "${protoData}" (parent: ${this.id}) is not a valid type (Proto.Reactivity). \n Element: ${element.outerHTML}`
-        );
-
-        return;
-      }
-
-      element.innerHTML = this[protoData]["value"];
+  #load(shadow) {
+    shadow.querySelectorAll("[proto-text]").forEach((element) => {
+      element.textContent =
+        this.reactiveData[element.getAttribute("proto-text")];
     });
   }
 
   /**
-   * @method
+   * @template T
+   * @param {ShadowRoot} shadow
    * @param {string} name
-   * @param {any} value
+   * @param {T} value
    */
-  reload(name, value) {
-    const elements = this.shadow?.querySelectorAll(`[p-data="${name}"]`);
-
-    elements?.forEach((element) => {
-      element.innerHTML = value;
+  #reload(shadow, name, value) {
+    shadow.querySelectorAll(`[proto-text="${name}"]`).forEach((element) => {
+      element.textContent = String(value);
     });
   }
 
@@ -155,10 +118,8 @@ export class ProtoElement extends HTMLElement {
     this.shadow = this.attachShadow({ mode: "open" });
 
     this.shadow.innerHTML = this.render();
-    this.shadow.innerHTML += this.styles();
 
-    this.#applyChildrenIds();
-    this.#load();
+    this.#load(this.shadow);
 
     this.after();
   }

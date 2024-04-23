@@ -1,7 +1,7 @@
 // @ts-check
 "use strict";
 
-import { ProtoElement } from "./proto-element.js";
+import { ProtoElement } from "../src/proto/proto-element.js";
 
 /**
  * @class
