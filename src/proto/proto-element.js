@@ -55,8 +55,9 @@ export class ProtoElement extends HTMLElement {
    * @template T
    * @param {T} value
    * @param {string} name
+   * @param {((value: T) => void)[]} observers
    */
-  reactive(value, name) {
+  reactive(value, name, observers = []) {
     this.reactiveData[name] = value;
 
     /** @param {T} newValue */
@@ -65,6 +66,10 @@ export class ProtoElement extends HTMLElement {
 
       if (this.shadow) {
         this.#reload(this.shadow, name, value);
+      }
+
+      if (observers != []) {
+        observers.forEach((observer) => observer(value));
       }
     };
 
@@ -77,6 +82,16 @@ export class ProtoElement extends HTMLElement {
 
       set value(newValue) {
         updateReactiveData(newValue);
+      },
+
+      /** @param {(value: T) => void} fn */
+      subscribe(fn) {
+        observers.push(fn);
+      },
+
+      /** @param {(value: T) => void} fn */
+      unsubscribe(fn) {
+        observers = observers.filter((o) => o !== fn);
       },
     };
   }
