@@ -2,11 +2,11 @@
 
 const root = document.querySelector("html");
 
-const dataElements = root?.querySelectorAll("[p\\:data]");
+const dataElements = root?.querySelectorAll("[\\$data]");
 
 dataElements?.forEach((dataElement) => {
   const data = new Function(
-    `return ${dataElement.getAttribute("p:data") ?? "{"}`
+    `return { ${dataElement.getAttribute("$data") ?? ""} }`
   )();
 
   const reactiveData = {};
@@ -30,8 +30,8 @@ dataElements?.forEach((dataElement) => {
     reactiveData[name] = value;
   });
 
-  dataElement.querySelectorAll("[p\\:text]").forEach((textElement) => {
-    const name = textElement.getAttribute("p:text") ?? "";
+  dataElement.querySelectorAll("[\\$text]").forEach((textElement) => {
+    const name = textElement.getAttribute("$text") ?? "";
 
     if (data[name] != null) {
       textElement.textContent = data[name];
@@ -46,11 +46,22 @@ dataElements?.forEach((dataElement) => {
     }
   });
 
-  dataElement.querySelectorAll("[p\\:on\\:click]").forEach((clickElement) => {
-    const func = clickElement.getAttribute("p:on:click") ?? "";
+  dataElement.querySelectorAll("[\\$onclick]").forEach((clickElement) => {
+    const func = clickElement.getAttribute("$onclick") ?? "";
 
     clickElement.addEventListener("click", () => {
       new Function("$", `${func}`)(reactiveData);
+    });
+  });
+
+  dataElement.querySelectorAll("input[\\$bind]").forEach((inputElement) => {
+    const names = inputElement.getAttribute("$bind")?.split(", ");
+
+    inputElement.addEventListener("input", () => {
+      // @ts-ignore
+      names.forEach((name) => {
+        reactiveData[name] = inputElement.value;
+      });
     });
   });
 });

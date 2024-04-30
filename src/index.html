@@ -7,20 +7,18 @@
     <title>Document</title>
   </head>
 
-  <body id="root" p:data="{ counter: 0 }">
-    <main>
-      <h1 p:text="counter"></h1>
-      <button p:on:click="$.counter = $.counter + 1000">Increment</button>
-      <button p:on:click="$.counter--">Decrement</button>
-    </main>
+  <body $data="value: 0, name: 1">
+    <h1 $text="value"></h1>
+    <h1 $text="name"></h1>
 
-    <p-counter></p-counter>
-
-    <template p:element="counter">
-      <div p:data="{ counter: 0 }">
-        <h1 p:text="counter"></h1>
-        <button p:on:click="counter++">Increment</button>
-      </div>
-    </template>
+    <input type="text" $bind="value, name" />
+    <input type="text" $bind="value, name" />
   </body>
 </html>
+
+<!-- <template $element="counter">
+  <div $data="{ counter: 0 }">
+    <h1 $text="counter"></h1>
+    <button $onclick="counter++">Increment</button>
+  </div>
+</template> -->
