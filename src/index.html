@@ -3,10 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script type="module" src="./proto_2/proto_2.js"></script>
+    <script type="module" src="./proto/proto.js"></script>
     <title>Document</title>
   </head>
-  <body>
-    <p-home></p-home>
+
+  <body id="root" p:data="{ counter: 0 }">
+    <main>
+      <h1 p:text="counter"></h1>
+      <button p:on:click="$.counter = $.counter + 1000">Increment</button>
+      <button p:on:click="$.counter--">Decrement</button>
+    </main>
+
+    <p-counter></p-counter>
+
+    <template p:element="counter">
+      <div p:data="{ counter: 0 }">
+        <h1 p:text="counter"></h1>
+        <button p:on:click="counter++">Increment</button>
+      </div>
+    </template>
   </body>
 </html>

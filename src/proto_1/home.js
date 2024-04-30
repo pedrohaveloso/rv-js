@@ -1,7 +1,7 @@
 // @ts-check
 "use strict";
 
-import { Proto } from "./proto/proto.js";
+import { Proto } from "./proto.js";
 
 Proto.define(
   "counter-el",
